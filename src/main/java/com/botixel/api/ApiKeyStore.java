@@ -9,6 +9,6 @@ public class ApiKeyStore {
     }
 
     public void setApiKey(String apiKey) {
-        ApiKey = apiKey;
+        this.ApiKey = apiKey;
     }
 }

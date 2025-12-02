@@ -7,10 +7,10 @@ import java.net.http.HttpResponse;
 
 public class ApiAcess {
 
-    private ApiKeyStore ApiKey;
+    private ApiKeyStore apiKey;
 
     public ApiAcess(ApiKeyStore apiKey) {
-        this.ApiKey = ApiKey;
+        this.apiKey = apiKey;
     }
 
     public String encontrarItem() {
@@ -19,7 +19,7 @@ public class ApiAcess {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.hypixel.net/v2/skyblock/auctions"))
-                    .header("API-Key", this.ApiKey.getApiKey())
+                    .header("API-Key", this.apiKey.getApiKey())
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
