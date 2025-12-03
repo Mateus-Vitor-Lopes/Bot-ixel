@@ -13,12 +13,12 @@ public class ApiAcess {
         this.apiKey = apiKey;
     }
 
-    public String encontrarItem() {
+    public String encontrarItem(int page) {
 
         try {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.hypixel.net/v2/skyblock/auctions"))
+                    .uri(URI.create("https://api.hypixel.net/v2/skyblock/auctions?page=" + page))
                     .header("API-Key", this.apiKey.getApiKey())
                     .build();
 
