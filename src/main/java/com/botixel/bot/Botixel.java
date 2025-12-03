@@ -16,7 +16,7 @@ public class Botixel extends ListenerAdapter {
     public static void main(String[] args) {
 
         //API de um ‘bot’ de discord
-        JDABuilder.createDefault("API Key")
+        JDABuilder.createDefault("API KEY")
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 .addEventListeners(new Botixel())
                 .build();
@@ -51,8 +51,8 @@ public class Botixel extends ListenerAdapter {
             if (item.isEmpty()) {
                 event.getChannel().sendMessage("❗ Você precisa informar um item❗").queue();
             } else {
-                String result = apiAcess.encontrarItem();
-                String filtered = filter.lowestPrice(result, item, price);
+
+                String filtered = filter.lowestPrice(item, price, apiAcess);
                 event.getChannel().sendMessage("```json\n" + filtered + "\n```").queue();
             }
         }

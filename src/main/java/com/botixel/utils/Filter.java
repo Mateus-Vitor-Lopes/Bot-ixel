@@ -1,49 +1,65 @@
 package com.botixel.utils;
 
+import com.botixel.api.ApiAcess;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class Filter {
 
-    public String lowestPrice(String json, String item, String price) {
+    public String lowestPrice(String item, String price, ApiAcess apiAcess) {
         try {
-            JsonObject object = JsonParser.parseString(json).getAsJsonObject();
-            JsonArray auctions = object.getAsJsonArray("auctions");
-            int lowest = Integer.MAX_VALUE;
-            int highest = Integer.MIN_VALUE;
+            long lowest = Long.MAX_VALUE;
+            long highest = Long.MIN_VALUE;
+            String jsonFirstPage = apiAcess.encontrarItem(0);
+            JsonObject object = JsonParser.parseString(jsonFirstPage).getAsJsonObject();
             String foundItem = null;
+            int totalPages = object.get("totalPages").getAsInt();
 
-            for (int i = 0; i < auctions.size(); i++) {
-                JsonObject auction = auctions.get(i).getAsJsonObject();
-                String itemName = auction.get("item_name").getAsString();
+            long start = System.currentTimeMillis();
 
-                if (itemName.equalsIgnoreCase(item)) {
-                    int value = auction.get("starting_bid").getAsInt();
+            for (int page = 0; page < totalPages; page++) {
 
-                    if (value > lowest && price.contains("<")) {
-                        lowest = value;
-                        foundItem = itemName;
-                    } else if (value < highest && price.contains(">")) {
-                        highest = value;
-                        foundItem = itemName;
+                String json = (page == 0) ? jsonFirstPage : apiAcess.encontrarItem(page);
+                JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
+                JsonArray auctions = obj.getAsJsonArray("auctions");
+
+                for (JsonElement element : auctions) {
+                    JsonObject auction = element.getAsJsonObject();
+                    String itemName = auction.get("item_name").getAsString();
+
+                    if (itemName.toLowerCase().contains(item.toLowerCase())) {
+                        long value = auction.get("starting_bid").getAsLong();
+
+                        if (price.contains("<") && value < lowest) {
+                            lowest = value;
+                            foundItem = itemName;
+
+                        } else if (price.contains(">") && value > highest) {
+                            highest = value;
+                            foundItem = itemName;
+                        }
                     }
                 }
             }
-
+            long fim = System.currentTimeMillis();
+            long total = fim - start;
             if (foundItem == null) {
                 return "Item " + item + " não foi encontrado.";
+            } else if (price.equals("<")) {
+                return "O menor preço listado para " + foundItem + " == " + lowest + " coins " + total;
             } else {
-                return "O menor preço listado para" + foundItem + " == " + lowest + " coins";
+                return "O maior preço listado para " + foundItem + " == " + highest + " coins " + total;
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "Erro ao filtar item: " +e.getMessage();
+            return "Erro ao filtar item: " + e.getMessage();
 
         }
 
-
     }
-
 }
+
+
